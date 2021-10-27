@@ -10,7 +10,7 @@ import {
 } from './index'
 
 const TheLayout = () => {
-  const darkMode = useSelector(state => state.darkMode)
+  const darkMode = useSelector(state => state.coreUi.darkMode)
   const classes = classNames(
     'c-app c-default-layout',
     darkMode && 'c-dark-theme'

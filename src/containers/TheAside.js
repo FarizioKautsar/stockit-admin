@@ -18,7 +18,7 @@ import {
 import CIcon from '@coreui/icons-react'
 
 const TheAside = () => {
-  const show = useSelector(state => state.asideShow)
+  const show = useSelector(state => state.coreUi.asideShow)
   const dispatch = useDispatch()
   const setState = (state) => dispatch({type: 'set', asideShow: state})
   

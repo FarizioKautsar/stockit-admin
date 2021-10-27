@@ -25,9 +25,9 @@ import {
 
 const TheHeader = () => {
   const dispatch = useDispatch()
-  const asideShow = useSelector(state => state.asideShow)
-  const darkMode = useSelector(state => state.darkMode)
-  const sidebarShow = useSelector(state => state.sidebarShow)
+  const asideShow = useSelector(state => state.coreUi.asideShow)
+  const darkMode = useSelector(state => state.coreUi.darkMode)
+  const sidebarShow = useSelector(state => state.coreUi.sidebarShow)
 
   const toggleSidebar = () => {
     const val = [true, 'responsive'].includes(sidebarShow) ? false : 'responsive'

@@ -21,7 +21,7 @@ import 'codemirror/mode/xml/xml'
 import sampleCode from './_examples'
 
 const CodeEditors = () => {
-  const darkMode = useSelector(state => state.darkMode)
+  const darkMode = useSelector(state => state.coreUi.darkMode)
   const [content, setContent] = React.useState(sampleCode.xml)
 
   const options = {

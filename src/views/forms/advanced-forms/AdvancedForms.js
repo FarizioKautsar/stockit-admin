@@ -29,7 +29,7 @@ import {useSelector} from 'react-redux';
 
 const AdvancedForms = () => {
 
-  const darkMode = useSelector(state => state.darkMode)
+  const darkMode = useSelector(state => state.coreUi.darkMode)
 
   const [value, setValue] = React.useState([
     { value: 'TX', label: 'Texas' },
