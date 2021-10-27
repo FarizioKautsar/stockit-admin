@@ -10,14 +10,17 @@ import * as serviceWorker from './serviceWorker';
 import { icons } from './assets/icons'
 
 import { Provider } from 'react-redux'
-import store from './store'
+import store, { rrfProps } from './store'
+import { ReactReduxFirebaseProvider } from 'react-redux-firebase';
 
 React.icons = icons
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App/>
+      <ReactReduxFirebaseProvider { ...rrfProps }>
+        <App/>
+      </ReactReduxFirebaseProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
