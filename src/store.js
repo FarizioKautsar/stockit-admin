@@ -1,19 +1,30 @@
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk';
+import rootReducer from './store/reducers/rootReducer'
+import { compose } from 'redux';
+import { firebase, firebaseConfig, firestore } from './utils/firebase';
+import { createFirestoreInstance, reduxFirestore, getFirestore } from 'redux-firestore';
+import { reactReduxFirebase,  getFirebase } from 'react-redux-firebase';
 
-const initialState = {
-  sidebarShow: 'responsive',
-  asideShow: false,
-  darkMode: false
+const store = createStore(
+  rootReducer,
+  compose(
+    applyMiddleware(
+      thunk.withExtraArgument({
+        getFirebase, 
+        getFirestore
+      })
+    ),
+    reduxFirestore(firebase, firebaseConfig),
+  )
+);
+
+const rrfProps = {
+  firebase,
+  config: firebaseConfig,
+  dispatch: store.dispatch,
+  createFirestoreInstance
 }
 
-const changeState = (state = initialState, { type, ...rest }) => {
-  switch (type) {
-    case 'set':
-      return {...state, ...rest }
-    default:
-      return state
-  }
-}
-
-const store = createStore(changeState)
-export default store
+export default store;
+export { rrfProps }
