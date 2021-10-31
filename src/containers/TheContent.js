@@ -2,12 +2,15 @@ import React, { Suspense } from 'react'
 import {
   Redirect,
   Route,
-  Switch
+  Switch,
+  useHistory
 } from 'react-router-dom'
 import { CContainer, CFade } from '@coreui/react'
 
 // routes config
 import routes from '../routes'
+import { useSelector } from 'react-redux'
+import { isEmpty, isLoaded, useFirebase, useFirestoreConnect } from 'react-redux-firebase'
   
 const loading = (
   <div className="pt-3 text-center">
@@ -16,6 +19,20 @@ const loading = (
 )
 
 const TheContent = () => {
+  const history = useHistory();
+  const auth = useSelector(state => state.firebase.auth)
+
+  if (auth?.isLoaded && auth?.isEmpty) {
+    history.replace("/login");
+  }
+
+  useFirebase();
+  const profile = useSelector(state => state.firebase.profile);
+ 
+  useFirestoreConnect(() => [
+    { collection: "companies", doc: profile.companyId }
+  ])
+
   return (
     <main className="c-main">
       <CContainer fluid>

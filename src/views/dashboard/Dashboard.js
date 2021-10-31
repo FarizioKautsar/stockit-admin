@@ -15,11 +15,21 @@ import {
 import CIcon from '@coreui/icons-react'
 
 import MainChartExample from '../charts/MainChartExample.js'
+import { useSelector } from 'react-redux'
+import { useFirebaseConnect, useFirestoreConnect } from 'react-redux-firebase'
+import { useHistory } from 'react-router'
 
 const WidgetsDropdown = lazy(() => import('../widgets/WidgetsDropdown.js'))
 const WidgetsBrand = lazy(() => import('../widgets/WidgetsBrand.js'))
 
 const Dashboard = () => {
+  const history = useHistory();
+  const auth = useSelector(state => state.firebase.auth)
+
+  if (auth?.isLoaded && auth?.isEmpty) {
+    history.replace("/login");
+  }
+
   return (
     <>
       <WidgetsDropdown />

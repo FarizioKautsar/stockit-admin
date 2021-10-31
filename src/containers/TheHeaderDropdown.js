@@ -8,8 +8,17 @@ import {
   CImg
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import { MdLogout } from 'react-icons/md'
+import { useDispatch } from 'react-redux'
+import { signOut } from 'src/store/actions/authActions'
 
 const TheHeaderDropdown = () => {
+  const dispatch = useDispatch();
+
+  function handleLogout() {
+    dispatch(signOut())
+  }
+
   return (
     <CDropdown
       inNav
@@ -26,7 +35,7 @@ const TheHeaderDropdown = () => {
         </div>
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
-        <CDropdownItem
+        {/* <CDropdownItem
           header
           tag="div"
           color="light"
@@ -78,11 +87,11 @@ const TheHeaderDropdown = () => {
           <CIcon name="cil-file" className="mfe-2" /> 
           Projects
           <CBadge color="primary" className="mfs-auto">42</CBadge>
-        </CDropdownItem>
-        <CDropdownItem divider />
-        <CDropdownItem>
-          <CIcon name="cil-lock-locked" className="mfe-2" /> 
-          Lock Account
+        </CDropdownItem> */}
+        {/* <CDropdownItem divider /> */}
+        <CDropdownItem onClick={handleLogout}>
+          <MdLogout className="mfe-2"/>
+          Log Out
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>

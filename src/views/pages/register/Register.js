@@ -14,8 +14,32 @@ import {
   CRow
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import { object, string } from 'yup';
+import { useForm } from 'react-hook-form';
 
 const Register = () => {
+  const formSchema = object().shape({
+    firstName: string()
+      .required(),
+    lastName: string()
+      .required(),
+    email: string()
+      .email()
+      .lowercase()
+      .required(),
+    password: string()
+      .min(5, "Password harus minimal 5 karakter dan lebih.")
+      .required(),
+  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm({
+    validationSchema: formSchema,
+  });
+
   return (
     <div className="c-app c-default-layout flex-row align-items-center">
       <CContainer>
