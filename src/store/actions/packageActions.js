@@ -1,22 +1,47 @@
-export const createPackage = (packages) => {
-  return (dispatch, getState, { getFirebase, getFirestore }) => {
+export const createPackage = (pack) => {
+  return (dispatch, getState, { getFirebase, getFirestore }) => Promise.resolve().then(() => {
     const firestore = getFirestore();
-    firestore.collection('packages').add({ 
-      ...packages,
-      authorFirstName: "Farizio",
-      authorLastName: "Kautsar",
-      authorId: 12345,
-      createdAt: new Date()
-    }).then(res => {
-      dispatch({ type: "CREATE_PACKAGE", payload: packages })
-    }).catch(err => {
-      dispatch({ type: "CREATE_PACKAGE_ERROR", err })
-    })
-  }
-}
+    const batch = firestore.batch();
+    const profile = getState().firebase.profile;
+    const authorId = getState().firebase.auth.uid;
 
-export const getPackages = (packages) => {
-  return (dispatch, getState, { firebase, firestore }) => {
-    dispatch({ type: "GET_PACKAGES", payload: packages })
-  }
-}
+    pack.items.forEach((item) => {
+      batch.set(
+        firestore
+        .collection("companies")
+        .doc(profile.companyId)
+        .collection("products")
+        .doc(item.id), { name: item.name }
+      );
+    });
+
+    pack.items = pack.items.map(item => ({ id: item.id, quantity: parseInt(item.quantity) }));
+    pack.xDim = parseInt(pack.xDim);
+    pack.yDim = parseInt(pack.yDim);
+    pack.zDim = parseInt(pack.zDim);
+
+    batch.commit()
+      .then(() => {
+        firestore
+        .collection("companies")
+        .doc(profile.companyId)
+        .collection("warehouses")
+        .doc(pack.warehouseId)
+        .collection("packages")
+        .add({ 
+          ...pack,
+          authorFirstName: profile.firstName,
+          authorLastName: profile.lastName,
+          authorId,
+          createdAt: new Date()
+        }).then(res => {
+          dispatch({ type: "CREATE_PACKAGE", payload: pack })
+        }).catch(err => {
+          dispatch({ type: "CREATE_PACKAGE_ERROR", err })
+        })
+      })
+      .catch(err => {
+        dispatch({ type: "CREATE_PACKAGE_ERROR", err })
+      })
+  }) 
+} 
