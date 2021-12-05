@@ -1,4 +1,4 @@
-import authReducer from "./authReducer";
+// import authReducer from "./authReducer";
 import packagesReducer from "./packageReducer";
 import { combineReducers } from "redux";
 import { persistReducer } from "redux-persist";
@@ -6,6 +6,7 @@ import storage from "redux-persist/lib/storage"; // defaults to localStorage for
 import coreUiReducer from "./coreUiReducer";
 import { firebaseReducer } from "react-redux-firebase";
 import { firestoreReducer } from "redux-firestore";
+import authReducer from "./authReducer";
 
 const persistConfig = {
   key: "root",
