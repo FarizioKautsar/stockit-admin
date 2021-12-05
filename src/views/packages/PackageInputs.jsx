@@ -1,8 +1,25 @@
 import { CButton, CCard, CCardBody, CCol, CFormGroup, CInput, CLabel, CRow, CSelect, CTextarea } from '@coreui/react';
 import React from 'react'
 import { MdDelete } from 'react-icons/md';
+import { useSelector } from 'react-redux';
+import { useFirestoreConnect } from 'react-redux-firebase';
 export default function PackageInputs(props) {
   const { register, items, warehouses } = props;
+  const profile = useSelector(state => state.firebase.profile);
+
+  useFirestoreConnect([
+    {
+      collection: "companies",
+      doc: `${profile.companyId}`,
+      subcollections: [
+        { collection: "products" }
+      ],
+      storeAs: "products"
+    }
+  ])
+
+  const firestoreState = useSelector(state => state.firestore);
+  const products = firestoreState.data.products;
 
   return (
     <CRow>
@@ -121,7 +138,8 @@ export default function PackageInputs(props) {
                       <CInput
                         required
                         id="name"
-                        value={item.name}
+                        disabled={products?.[item.id]}
+                        value={products?.[item.id]?.name || item.name}
                         onChange={(e) => props.onItemChange(idx, "name")(e.target.value)}
                       />
                     </CFormGroup>
@@ -143,6 +161,8 @@ export default function PackageInputs(props) {
         }
         <CButton
           className="w-100"
+          color="primary"
+          variant="outline"
           onClick={props.onItemAdd}
         >
           + Add Item

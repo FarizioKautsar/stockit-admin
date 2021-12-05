@@ -15,21 +15,27 @@ export const createPackage = (pack) => {
       );
     });
 
-    pack.items = pack.items.map(item => ({ id: item.id, quantity: parseInt(item.quantity) }));
-    pack.xDim = parseInt(pack.xDim);
-    pack.yDim = parseInt(pack.yDim);
-    pack.zDim = parseInt(pack.zDim);
-
+    
     batch.commit()
-      .then(() => {
-        firestore
+    .then(() => {
+      const packagesRef = firestore
         .collection("companies")
         .doc(profile.companyId)
         .collection("warehouses")
         .doc(pack.warehouseId)
         .collection("packages")
-        .add({ 
+      
+      const packageId = packagesRef.doc().id;
+
+      packagesRef
+        .doc(packageId).set({
           ...pack,
+          packageId,
+          companyId: profile.companyId,
+          items: pack.items.map(item => ({ id: item.id, quantity: parseInt(item.quantity) })),
+          xDim: parseInt(pack.xDim),
+          yDim: parseInt(pack.yDim),
+          zDim: parseInt(pack.zDim),
           authorFirstName: profile.firstName,
           authorLastName: profile.lastName,
           authorId,

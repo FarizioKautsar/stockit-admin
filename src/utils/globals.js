@@ -10,3 +10,10 @@ export const DISPLAY_NAME_ERROR_MESSAGE = `Invalid Username. Username harus:
  2. Hanya memiliki huruf (a-z), nomor (0-9) , _ dan -  
  3. Tidak boleh ada huruf kapital
  `;
+
+ export const statusEnum = {
+   ready: "Ready",
+   indelivery: "In Delivery",
+   arrived: "Arrived",
+   unpacked: "Unpacked"
+ }

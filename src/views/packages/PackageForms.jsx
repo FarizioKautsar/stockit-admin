@@ -56,7 +56,6 @@ export default function PackageForms(props) {
 
   function handleItemDelete(index) {
     const newItems = items.filter((item, idx) => idx !== index);
-    console.log(newItems)
     setItems(newItems);
   }
 
@@ -70,12 +69,6 @@ export default function PackageForms(props) {
     setIsSubmitting(true);
     const payload = { ...data, status: "ready", items }
     dispatch(createPackage(payload))
-      // .then(res => {
-      //   console.log(res)
-      // })
-      // .catch(err => {
-      //   console.log(err);
-      // })
       .finally(() => {
         history.push("/packages");
       })
@@ -83,12 +76,6 @@ export default function PackageForms(props) {
 
   return (
     <>
-      <Link to="/packages">
-        <CButton className="mb-4">
-          <MdArrowBack/>
-          Back
-        </CButton>
-      </Link>
       <CForm onSubmit={handleSubmit(onSubmit)}>
         <CCard>
           <CCardHeader>
