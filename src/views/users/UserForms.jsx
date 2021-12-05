@@ -1,8 +1,9 @@
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormGroup, CInput, CLabel, CRow } from '@coreui/react'
+import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormGroup, CInput, CLabel, CRow, CSelect, CSpinner } from '@coreui/react'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { MdArrowBack } from 'react-icons/md';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { isLoaded, useFirestoreConnect } from 'react-redux-firebase';
 import { Link } from 'react-router-dom';
 import { signUp } from 'src/store/actions/authActions';
 import { number } from 'yup';
@@ -10,6 +11,11 @@ import { string } from 'yup';
 import { object } from 'yup';
 
 export default function UserForms() {
+  useFirestoreConnect(['roles']);
+  const roles = useSelector((state) => state.firestore.ordered.roles);
+  console.log(isLoaded(roles));
+  console.log(roles);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch();
   const formSchema = object().shape({
@@ -112,6 +118,30 @@ export default function UserForms() {
                     {...register("password")}
                     innerRef={register("password").ref}
                   />
+                </CFormGroup>
+              </CCol>
+              <CCol sm={12} md={6}>
+                <CFormGroup className="w-100">
+                  <CLabel htmlFor="roleId">Role</CLabel>
+                  {
+                    isLoaded(roles) ?
+                    <CSelect
+                      required
+                      id="roleId"
+                      type="roleId"
+                      {...register("roleId")}
+                      innerRef={register("roleId").ref}
+                    >
+                      <option disabled>- Select Role -</option>
+                      {
+                        roles.map(role => (
+                          <option value={role.id}>{role.name[0].toUpperCase() + role.name.substring(1)}</option>
+                        ))
+                      }
+                    </CSelect>
+                    :
+                    <CSpinner/>
+                  }
                 </CFormGroup>
               </CCol>
             </CRow>
