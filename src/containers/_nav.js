@@ -1,5 +1,7 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
+import { MdPerson, MdPersonAdd } from 'react-icons/md'
+import { FaBuilding, FaTruck } from 'react-icons/fa'
 
 const _nav = [
   {
@@ -7,27 +9,77 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon name="cil-speedometer" customClasses="c-sidebar-nav-icon"/>,
-    badge: {
-      color: 'info',
-      text: 'NEW',
-    }
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'My Company',
+    to: '/my-company',
+    icon: <FaBuilding className="c-sidebar-nav-icon"/>,
   },
   {
     _tag: 'CSidebarNavTitle',
-    _children: ['Theme']
+    _children: ['Users']
   },
   {
     _tag: 'CSidebarNavItem',
-    name: 'Colors',
-    to: '/theme/colors',
-    icon: 'cil-drop',
+    name: 'Users',
+    to: '/users',
+    icon: <MdPerson className="c-sidebar-nav-icon"/>,
   },
   {
     _tag: 'CSidebarNavItem',
-    name: 'Typography',
-    to: '/theme/typography',
-    icon: 'cil-pencil',
+    name: 'Create User',
+    to: '/users/create',
+    icon: <MdPersonAdd className="c-sidebar-nav-icon"/>,
   },
+  {
+    _tag: 'CSidebarNavTitle',
+    _children: ['Warehouse']
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'All Warehouses',
+    to: '/warehouses',
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Create Warehouse',
+    to: '/warehouses/create',
+  },
+  {
+    _tag: 'CSidebarNavTitle',
+    _children: ['Delivery']
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'All Deliveries',
+    to: '/deliveries',
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Create Delivery',
+    to: '/deliveries/create',
+  },
+  {
+    _tag: 'CSidebarNavTitle',
+    _children: ['Packages']
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'All Packages',
+    to: '/packages',
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Create Package',
+    to: '/packages/create',
+  },
+  // {
+  //   _tag: 'CSidebarNavItem',
+  //   name: 'Typography',
+  //   to: '/theme/typography',
+  //   icon: 'cil-pencil',
+  // },
   {
     _tag: 'CSidebarNavTitle',
     _children: ['Components']

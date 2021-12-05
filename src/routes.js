@@ -1,6 +1,18 @@
 import { exact } from 'prop-types';
 import React from 'react';
+import Companydetails from './views/company/CompanyDetails';
+import Deliveries from './views/delivery/Deliveries';
+import Delivery from './views/delivery/Delivery';
+import DeliveryForms from './views/delivery/DeliveryForms';
+import DeliveryUnpack from './views/delivery/DeliveryUnpack';
+import Package from './views/packages/Package';
 import PackageForms from './views/packages/PackageForms';
+import Packages from './views/packages/Packages';
+import CompanyForms from './views/pages/companyInit/CompanyForms';
+import UserForms from './views/users/UserForms';
+import Warehouse from './views/warehouse/Warehouse';
+import WarehouseForms from './views/warehouse/WarehouseForms';
+import Warehouses from './views/warehouse/Warehouses';
 
 const CodeEditors = React.lazy(() => import('./views/editors/code-editors/CodeEditors'));
 const TextEditors = React.lazy(() => import('./views/editors/text-editors/TextEditors'));
@@ -54,11 +66,24 @@ const Users = React.lazy(() => import('./views/users/Users'));
 const User = React.lazy(() => import('./views/users/User'));
 
 const routes = [
-  { path: '/auth/login', exact: true, name: "Login" },
-  { path: '/users', exact: true, name: 'Users' },
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
-  { path: '/packages/create', name: 'Create Package', component: PackageForms }
+  { path: '/my-company', exact: true, name: "My Company", component: Companydetails },
+  { path: '/create-company', exact: true, name: 'Create Company', component: CompanyForms },
+  { path: '/packages/create', exact: true, name: 'Create Package', component: PackageForms },
+  { path: '/packages/:packageId', exact: true, name: 'Package Details', component: Package },
+  { path: '/packages', exact: true, name: 'Packages', component: Packages },
+  { path: '/deliveries/create', exact: true, name: 'Create Delivery', component: DeliveryForms },
+  { path: '/deliveries/:deliveryId', exact: true, name: 'Delivery Details', component: Delivery },
+  { path: '/deliveries/:deliveryId/unpack', exact: true, name: 'Unpack Delivery', component: DeliveryUnpack },
+  { path: '/deliveries/:deliveryId/edit', exact: true, name: 'Edit Delivery', component: DeliveryForms },
+  { path: '/deliveries', exact: true, name: 'Deliveries', component: Deliveries },
+  { path: '/users', exact: true, name: 'Users' },
+  { path: '/users/create', exact: true, name: 'Create User', component: UserForms },
+  { path: '/warehouses/create', exact: true, name: 'Create Warehouse', component: WarehouseForms },
+  { path: '/warehouses/:warehouseId', exact: true, name: 'Warehouse Details', component: Warehouse },
+  { path: '/warehouses/:warehouseId/edit', exact: true, name: 'Edit Warehouse', component: WarehouseForms },
+  { path: '/warehouses', exact: true, name: 'Warehouses', component: Warehouses },
   // { path: '/theme', name: 'Theme', component: Colors, exact: true },
   // { path: '/theme/colors', name: 'Colors', component: Colors },
   // { path: '/theme/typography', name: 'Typography', component: Typography },
