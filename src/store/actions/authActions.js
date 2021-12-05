@@ -31,18 +31,19 @@ export const signUp = (newUser) => {
   return (dispatch, getState, {getFirebase, getFirestore}) => {
     const firebase = getFirebase();
     const firestore = getFirestore();
+    const profile = getState().firebase.profile;
 
     firebase.createUser({
       email: newUser.email, 
       password: newUser.password,
       username: newUser.username,
-    }).then(resp => {
-      return firestore.collection('users').doc(resp.user.uid).set({
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-      });
+    }, {
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      roleId: newUser.roleId,
+      company: profile.companyId
     }).then(() => {
-      dispatch({ type: 'SIGNUP_SUCCESS' });
+      dispatch({ type: 'SIGNUP_SUCCESS' })
     }).catch((err) => {
       dispatch({ type: 'SIGNUP_ERROR', err });
     });
