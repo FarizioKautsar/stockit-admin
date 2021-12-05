@@ -2,13 +2,17 @@ import { CButton, CCard, CCardBody, CCardHeader, CCol, CForm, CFormGroup, CLabel
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { MdArrowRight } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { useFirestoreConnect } from 'react-redux-firebase';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
+import { unpackDelivery } from 'src/store/actions/deliveryActions';
 
 export default function DeliveryUnpack() {
   const deliveryId = useParams().deliveryId;
   const profile = useSelector(state => state.firebase.profile);
+  const dispatch = useDispatch();
+  const history = useHistory();
 
   const firestoreState = useSelector(state => state.firestore);
   const delivery = firestoreState.ordered.deliveries?.[0];
@@ -70,6 +74,7 @@ export default function DeliveryUnpack() {
   ])
 
   const [selectedPackageId, setSelectedPackageId] = useState();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleSelectPackage(packId) {
     setSelectedPackageId(packId);
@@ -84,7 +89,8 @@ export default function DeliveryUnpack() {
     formState: { errors },
   } = useForm();
 
-  function onSubmit(data) {
+  async function onSubmit(data) {
+    setIsSubmitting(true);
     var items = []
     for (const packId of delivery.packageIds) {
       items.push(...packages[packId].items)
@@ -99,7 +105,10 @@ export default function DeliveryUnpack() {
       const itemIds = shelfItemArr.filter(s => s.shelfId === shelfId);
       shelfItem.push({ shelfId, items: itemIds.map(i => ({id: i.itemId, quantity: itemQtys[i.itemId]})) })
     }
-    console.log({...delivery, shelfItem})
+    console.log(shelfItem);
+    await dispatch(unpackDelivery({...delivery, shelfItem}));
+    setIsSubmitting(false);
+    history.push("/deliveries");
   }
 
   return (
@@ -200,6 +209,7 @@ export default function DeliveryUnpack() {
         <CButton
           color="success"
           type="submit"
+          disabled={isSubmitting}
         >
           Commit Store
         </CButton>

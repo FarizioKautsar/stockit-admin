@@ -116,7 +116,7 @@ export const updateDeliveryStatus = (delivery) => {
 }
 
 export const updateDelivery = (delivery) => {
-  return (dispatch, getState, { getFirebase, getFirestore }) => Promise.resolve().then(() => {
+  return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const profile = getState().firebase.profile;
     const firestore = getFirestore();
 
@@ -125,19 +125,19 @@ export const updateDelivery = (delivery) => {
       .doc(profile.companyId)
       .collection("deliveries")
 
-    deliveriesRef.doc(delivery.id).update({ 
-      ...delivery
-    }).then(res => {
+    try {      
+      await deliveriesRef.doc(delivery.id).update({ 
+        ...delivery
+      })
       dispatch({ type: "UPDATE_DELIVERY", payload: delivery })
-    })
-    .catch(err => {
+    } catch (err) {
       dispatch({ type: "UPDATE_DELIVERY_ERROR", err })
-    })
-  })
+    }
+  }
 }
 
 export const unpackDelivery = (delivery) => {
-  return (dispatch, getState, { getFirebase, getFirestore }) => Promise.resolve().then(() => {
+  return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const profile = getState().firebase.profile;
     const firestore = getFirestore();
     const batch = firestore.batch();
@@ -149,11 +149,57 @@ export const unpackDelivery = (delivery) => {
       .doc(delivery.warehouseIdTo)
       .collection("shelves")
 
-    delivery.shelfItem.forEach(shelf => {
-      batch.update(
-        shelfRef.doc(shelf.shelfId),
-        { items: shelf.items }
+    for (const shelf of delivery.shelfItem) {
+      const snapShot = await shelfRef.doc(shelf.shelfId).get()
+      const shelfDoc = snapShot.data();
+      if (shelfDoc.items) {
+        const newItems = { 
+          items: shelf.items.map(item => 
+            {
+              return { 
+                id: item.id, 
+                quantity: item.quantity + (shelfDoc.items.filter(iDoc => iDoc.id === item.id)[0]?.quantity || 0)
+              }
+            }
+          ) 
+        }
+        batch.set(
+          shelfRef.doc(shelf.shelfId),
+          newItems
+        )
+      } else {
+        batch.set(
+          shelfRef.doc(shelf.shelfId),
+          { items: shelf.items }
+        )
+      }
+    }
+
+    for (const packId of delivery.packageIds) {
+      batch.delete(
+        firestore
+          .collection("companies")
+          .doc(profile.companyId)
+          .collection("warehouses")
+          .doc(delivery.warehouseIdFrom)
+          .collection("packages")
+          .doc(packId)
       )
-    })
-  })
+    }
+
+    try {
+      console.log("COMMITTING");
+      await batch.commit()
+      console.log("DELETING DELIVERY");
+      await firestore
+      .collection("companies")
+      .doc(profile.companyId)
+      .collection("deliveries")
+      .doc(delivery.id)
+      .delete()
+      dispatch({ type: "UPDATE_DELIVERY", payload: delivery })
+    } catch(err) {
+      dispatch({ type: "UPDATE_DELIVERY_ERROR", err })
+    }
+  }
 }
