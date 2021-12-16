@@ -32,7 +32,7 @@ export default function Warehouse() {
           <CButton
             color="primary"
           >
-            Edit Delivery
+            Edit Warehouse
           </CButton>
         </Link>
       </CCardHeader>
@@ -44,6 +44,11 @@ export default function Warehouse() {
             <h6>Address</h6>
             <p>{warehouse?.address}</p>
             <h6>Number of Shelf</h6>
+            <p>{warehouse?.shelvesAmount}</p>
+            <br/>
+            <CButton is={Link} to={warehouseId + "/inventory"}>
+              View Inventory
+            </CButton>
           </CCol>
           <CCol xs={6}>
             <h6>Location</h6>
