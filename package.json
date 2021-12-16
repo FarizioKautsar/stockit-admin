@@ -68,6 +68,7 @@
     "redux-thunk": "^2.3.0",
     "spinkit": "~2.0.1",
     "swiper": "^6.8.4",
+    "underscore": "^1.13.1",
     "yup": "^0.32.8"
   },
   "devDependencies": {
