@@ -51,7 +51,7 @@ export default function Warehouses() {
                     Details
                   </CButton>
                 </Link>
-                <Link to={"/warehouses/" + wh.id}>
+                <Link to={"/warehouses/" + wh.id + "/inventory"}>
                   <CButton color="primary" variant="outline" className="mr-3">
                     Show Inventory
                   </CButton>
