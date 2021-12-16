@@ -4,6 +4,7 @@ import { withGoogleMap, withScriptjs, GoogleMap, Marker } from 'react-google-map
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useFirestore } from 'react-redux-firebase';
+import { useHistory } from 'react-router';
 import { compose, withProps } from 'recompose';
 import { createWarehouse } from 'src/store/actions/warehouseActions';
 import { number, object, string } from 'yup';
@@ -31,6 +32,7 @@ export const WarehouseMapComponent = compose(
 
 function WarehouseForms(props) {
   const firestore = useFirestore();
+  const history = useHistory();
   const dispatch = useDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -58,12 +60,13 @@ function WarehouseForms(props) {
     })
   }
 
-  function onSubmit(data) {
+  async function onSubmit(data) {
+    setIsSubmitting(true);
     const payload = {...data, location};
-    dispatch(createWarehouse(payload))
-      .finally(() => {
-         
-      })
+    console.log("CREATING")
+    await dispatch(createWarehouse(payload));
+    setIsSubmitting(false);
+    history.push("/warehouses");
   }
 
   return (
