@@ -4,8 +4,9 @@ import { MdDelete } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import { useFirestoreConnect } from 'react-redux-firebase';
 export default function PackageInputs(props) {
-  const { register, items, warehouses } = props;
+  const { register, items, warehouses, watch } = props;
   const profile = useSelector(state => state.firebase.profile);
+  // console.log("WAREHOUSEID", watch("warehouseId"));
 
   useFirestoreConnect([
     {
@@ -15,11 +16,30 @@ export default function PackageInputs(props) {
         { collection: "products" }
       ],
       storeAs: "products"
-    }
+    }, 
+    ...watch("warehouseId") ? [{
+      collection: "companies",
+      doc: `${profile.companyId}`,
+      subcollections: [
+        { 
+          collection: "warehouses",
+          doc: watch("warehouseId"),
+        },
+        {
+          collection: "shelves"
+        }
+      ],
+      storeAs: "shelves"
+    }] : []
   ])
 
   const firestoreState = useSelector(state => state.firestore);
   const products = firestoreState.data.products;
+  const itemsArrTemp = firestoreState.ordered.shelves?.map(s => s.items);
+  const itemsArr = [].concat(...itemsArrTemp ? itemsArrTemp : [])?.filter(i => i);
+  const itemIds = Array.from(new Set(itemsArr?.map(i => i.id)));
+  console.log(itemIds);
+  console.log(itemsArr);
 
   return (
     <CRow>
@@ -30,12 +50,13 @@ export default function PackageInputs(props) {
             <CLabel htmlFor="warehouseId">Warehouse</CLabel>
             <CSelect
               required
-              id="warehouseId"
+              id="warehouseId"d
+              defaultValue=""
               type="warehouseId"
               {...register("warehouseId")}
               innerRef={register("warehouseId").ref}
             >
-              <option disabled selected>- Select Warehouse -</option>
+              <option disabled value="">- Select Warehouse -</option>
               {
                 warehouses.map(wh => (
                   <option value={wh.id}>{wh.name}</option>
@@ -111,13 +132,19 @@ export default function PackageInputs(props) {
                 <CRow>
                   <CCol xs={8}>
                     <CFormGroup>
-                      <CLabel htmlFor="productId">EAN ID</CLabel>
-                      <CInput
+                      <CLabel htmlFor="productId">Product</CLabel>
+                      <CSelect
                         required
                         id="productId"
                         value={item.id}
                         onChange={(e) => props.onItemChange(idx, "id")(e.target.value)}
-                      />
+                      >
+                        {
+                          itemIds?.map(itemId => (
+                            <option value={itemId}>{products?.[itemId]?.name}</option>
+                          ))
+                        }
+                      </CSelect>
                     </CFormGroup>
                   </CCol>
                   <CCol xs={4}>
@@ -129,18 +156,6 @@ export default function PackageInputs(props) {
                         id="quantity"
                         value={item.quantity}
                         onChange={(e) => props.onItemChange(idx, "quantity")(e.target.value)}
-                      />
-                    </CFormGroup>
-                  </CCol>
-                  <CCol xs={12}>
-                    <CFormGroup>
-                      <CLabel htmlFor="name">Name</CLabel>
-                      <CInput
-                        required
-                        id="name"
-                        disabled={products?.[item.id]}
-                        value={products?.[item.id]?.name || item.name}
-                        onChange={(e) => props.onItemChange(idx, "name")(e.target.value)}
                       />
                     </CFormGroup>
                   </CCol>
