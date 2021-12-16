@@ -1,38 +1,43 @@
-export const createPackage = (pack) => {
-  return (dispatch, getState, { getFirebase, getFirestore }) => Promise.resolve().then(() => {
+export const createPackage = (payload) => {
+  return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const firestore = getFirestore();
     const batch = firestore.batch();
     const profile = getState().firebase.profile;
     const authorId = getState().firebase.auth.uid;
 
-    pack.items.forEach((item) => {
-      batch.set(
+    const pack = payload.pack;
+
+    payload.shelves.forEach((shelf) => {
+      batch.update(
         firestore
         .collection("companies")
         .doc(profile.companyId)
-        .collection("products")
-        .doc(item.id), { name: item.name }
+        .collection("warehouses")
+        .doc(payload.pack.warehouseId)
+        .collection("shelves")
+        .doc(shelf.id), { items: shelf.items || [] }
       );
     });
 
-    
-    batch.commit()
-    .then(() => {
+    try {      
+      await batch.commit()
       const packagesRef = firestore
         .collection("companies")
         .doc(profile.companyId)
         .collection("warehouses")
         .doc(pack.warehouseId)
         .collection("packages")
-      
-      const packageId = packagesRef.doc().id;
 
-      packagesRef
+        
+      const packageId = packagesRef.doc().id;
+      console.log(packageId);
+        
+      await packagesRef
         .doc(packageId).set({
           ...pack,
           packageId,
           companyId: profile.companyId,
-          items: pack.items.map(item => ({ id: item.id, quantity: parseInt(item.quantity) })),
+          items: pack.items?.map(item => ({ id: item.id, quantity: parseInt(item.quantity) })),
           xDim: parseInt(pack.xDim),
           yDim: parseInt(pack.yDim),
           zDim: parseInt(pack.zDim),
@@ -40,14 +45,12 @@ export const createPackage = (pack) => {
           authorLastName: profile.lastName,
           authorId,
           createdAt: new Date()
-        }).then(res => {
-          dispatch({ type: "CREATE_PACKAGE", payload: pack })
-        }).catch(err => {
-          dispatch({ type: "CREATE_PACKAGE_ERROR", err })
         })
-      })
-      .catch(err => {
-        dispatch({ type: "CREATE_PACKAGE_ERROR", err })
-      })
-  }) 
+
+      dispatch({ type: "CREATE_PACKAGE", payload: pack })
+    } catch (err) {
+      console.log(err);
+      dispatch({ type: "CREATE_PACKAGE_ERROR", err })
+    }
+  }
 } 
