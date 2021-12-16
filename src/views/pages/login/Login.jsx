@@ -128,9 +128,9 @@ export default function Login(props) {
                       >
                         Login
                       </CButton>
-                      {/* <div className="ml-3">
+                      <div className="ml-3">
                         Need an account? <Link to="signup">Sign Up</Link>
-                      </div> */}
+                      </div>
                     </div>
                   </CForm>
                 </CCardBody>

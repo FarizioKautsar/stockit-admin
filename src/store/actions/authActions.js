@@ -28,7 +28,7 @@ export const signOut = () => {
 }
 
 export const signUp = (newUser) => {
-  return (dispatch, getState, {getFirebase, getFirestore}) => {
+  return async (dispatch, getState, {getFirebase, getFirestore}) => {
     const firebase = getFirebase();
     const firestore = getFirestore();
     const profile = getState().firebase.profile;
