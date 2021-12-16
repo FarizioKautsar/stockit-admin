@@ -19,7 +19,8 @@ export default function DeliveryUnpack() {
   const packages = firestoreState.data.packages;
   const products = firestoreState.data.products;
   const warehouse = firestoreState.data.warehouses?.[0];
-  const shelves = firestoreState.ordered.shelves;
+  const shelvesArr = firestoreState.ordered.shelves;
+  var shelves = firestoreState.data.shelves;
 
   useFirestoreConnect([
     {
@@ -90,26 +91,42 @@ export default function DeliveryUnpack() {
   } = useForm();
 
   async function onSubmit(data) {
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
+    var shelvesTemp = { ...shelves };
+
     var items = []
-    for (const packId of delivery.packageIds) {
+    for (const packId of delivery?.packageIds) {
       items.push(...packages[packId].items)
     }
+
+    // Total item quantity of all item ({ [itemId]: [itemQuantity] })
     const itemQtys = items.reduce((a, v) => {
       const itemQty = items.filter(i => i.id === v.id).map(i => i.quantity).reduce((a, b) => a+b)
       return { ...a, [v.id]: itemQty}
     }, {})
-    const shelfItemArr = Object.keys(data).map(key => ({ itemId: key, shelfId: data[key] }));
-    var shelfItem = []
-    for (const shelfId of Array.from(new Set(Object.values(data)))) {
-      const itemIds = shelfItemArr.filter(s => s.shelfId === shelfId);
-      shelfItem.push({ shelfId, items: itemIds.map(i => ({id: i.itemId, quantity: itemQtys[i.itemId]})) })
+
+    for (const itemId of items.map(i => i.id)) {
+      var shelf = shelvesTemp[data[itemId]];
+      const shelfId = data[itemId];
+      shelvesTemp[shelfId] = { ...shelf };
+      var currItem = shelf.items?.filter(i => i.id === itemId)?.[0];
+      if (!currItem) {
+        const newItem = { id: itemId, quantity: itemQtys[itemId] };
+        shelvesTemp[shelfId].items = [...shelf.items ? [...shelf.items, newItem] : [newItem]];
+      } else {
+        shelvesTemp[shelfId].items = shelf.items.filter(i => i.id !== itemId);
+        shelvesTemp[shelfId].items.push({ id: itemId, quantity: currItem.quantity + itemQtys[itemId] })
+      }
     }
-    console.log(shelfItem);
-    await dispatch(unpackDelivery({...delivery, shelfItem}));
-    setIsSubmitting(false);
-    history.push("/deliveries");
-  }
+
+    console.log(shelvesTemp);
+
+    dispatch(unpackDelivery({...delivery, shelves: shelvesTemp}))
+      .finally(() => {
+        setIsSubmitting(false);
+        history.push("/deliveries");
+      })
+    }
 
   return (
     <CForm onSubmit={handleSubmit(onSubmit)}>
@@ -181,7 +198,7 @@ export default function DeliveryUnpack() {
                                     {...register(item.id)}
                                     innerRef={register(item.id).ref}
                                   >
-                                    {shelves?.map((s, idx) => (
+                                    {shelvesArr?.map((s, idx) => (
                                       <option key={idx} value={s.id}>{s.id}</option>
                                     ))}
                                   </CSelect>

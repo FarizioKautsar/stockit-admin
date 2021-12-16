@@ -117,6 +117,7 @@ export const updateDeliveryStatus = (delivery) => {
 
 export const updateDelivery = (delivery) => {
   return async (dispatch, getState, { getFirebase, getFirestore }) => {
+    console.log("UPATEING")
     const profile = getState().firebase.profile;
     const firestore = getFirestore();
 
@@ -138,6 +139,7 @@ export const updateDelivery = (delivery) => {
 
 export const unpackDelivery = (delivery) => {
   return async (dispatch, getState, { getFirebase, getFirestore }) => {
+    console.log("STARTING UNPACK")
     const profile = getState().firebase.profile;
     const firestore = getFirestore();
     const batch = firestore.batch();
@@ -149,30 +151,8 @@ export const unpackDelivery = (delivery) => {
       .doc(delivery.warehouseIdTo)
       .collection("shelves")
 
-    for (const shelf of delivery.shelfItem) {
-      const snapShot = await shelfRef.doc(shelf.shelfId).get()
-      const shelfDoc = snapShot.data();
-      if (shelfDoc.items) {
-        const newItems = { 
-          items: shelf.items.map(item => 
-            {
-              return { 
-                id: item.id, 
-                quantity: item.quantity + (shelfDoc.items.filter(iDoc => iDoc.id === item.id)[0]?.quantity || 0)
-              }
-            }
-          ) 
-        }
-        batch.set(
-          shelfRef.doc(shelf.shelfId),
-          newItems
-        )
-      } else {
-        batch.set(
-          shelfRef.doc(shelf.shelfId),
-          { items: shelf.items }
-        )
-      }
+    for (const shelfId of Object.keys(delivery.shelves)) {
+      batch.set(shelfRef.doc(shelfId), delivery.shelves[shelfId])
     }
 
     for (const packId of delivery.packageIds) {
@@ -188,9 +168,7 @@ export const unpackDelivery = (delivery) => {
     }
 
     try {
-      console.log("COMMITTING");
       await batch.commit()
-      console.log("DELETING DELIVERY");
       await firestore
       .collection("companies")
       .doc(profile.companyId)
