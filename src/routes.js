@@ -10,6 +10,7 @@ import PackageForms from './views/packages/PackageForms';
 import Packages from './views/packages/Packages';
 import CompanyForms from './views/pages/companyInit/CompanyForms';
 import UserForms from './views/users/UserForms';
+import Inventory from './views/warehouse/Inventory';
 import Warehouse from './views/warehouse/Warehouse';
 import WarehouseForms from './views/warehouse/WarehouseForms';
 import Warehouses from './views/warehouse/Warehouses';
@@ -82,6 +83,7 @@ const routes = [
   { path: '/users/create', exact: true, name: 'Create User', component: UserForms },
   { path: '/warehouses/create', exact: true, name: 'Create Warehouse', component: WarehouseForms },
   { path: '/warehouses/:warehouseId', exact: true, name: 'Warehouse Details', component: Warehouse },
+  { path: '/warehouses/:warehouseId/inventory', exact: true, name: 'View Inventory', component: Inventory },
   { path: '/warehouses/:warehouseId/edit', exact: true, name: 'Edit Warehouse', component: WarehouseForms },
   { path: '/warehouses', exact: true, name: 'Warehouses', component: Warehouses },
   // { path: '/theme', name: 'Theme', component: Colors, exact: true },
