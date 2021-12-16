@@ -17,6 +17,7 @@ import CIcon from '@coreui/icons-react'
 
 // sidebar nav config
 import navigation from './_nav'
+import logo from 'src/assets/images/header-logo.svg'
 
 const TheSidebar = () => {
   const dispatch = useDispatch()
@@ -28,12 +29,13 @@ const TheSidebar = () => {
       unfoldable
       onShowChange={(val) => dispatch({type: 'set', sidebarShow: val })}
     >
-      <CSidebarBrand className="d-md-down-none" to="/">
-        <CIcon
+      <CSidebarBrand className="d-md-down-none p-4" to="/">
+        <img src={logo} className='c-sidebar-brand-full' width="100%"/>
+        {/* <CIcon
           className="c-sidebar-brand-full"
           name="logo-negative"
           height={35}
-        />
+        /> */}
         <CIcon
           className="c-sidebar-brand-minimized"
           name="sygnet"
@@ -53,7 +55,7 @@ const TheSidebar = () => {
         />
 
         <CSidebarNavDivider />
-        <CSidebarNavTitle>System Utilization</CSidebarNavTitle>
+        {/* <CSidebarNavTitle>System Utilization</CSidebarNavTitle>
         <CNavItem className="px-3 d-compact-none c-d-minimized-none">
           <div className="text-uppercase mb-1"><small><b>CPU Usage</b></small></div>
           <CProgress size="xs" value={25} color="info" />
@@ -68,7 +70,7 @@ const TheSidebar = () => {
           <div className="text-uppercase mb-1"><small><b>SSD 1 Usage</b></small></div>
           <CProgress size="xs" value={95} color="danger" />
           <small className="text-muted">243GB/256GB</small>
-        </CNavItem>
+        </CNavItem> */}
       </CSidebarNav>
       <CSidebarMinimizer className="c-d-md-down-none"/>
     </CSidebar>
