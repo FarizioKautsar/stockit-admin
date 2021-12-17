@@ -1,9 +1,11 @@
 export const createDelivery = (delivery) => {
-  return (dispatch, getState, { getFirebase, getFirestore }) => Promise.resolve().then(() => {
+  return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const profile = getState().firebase.profile;
     const authorId = getState().firebase.auth.uid;
     const firestore = getFirestore();
     const batch = firestore.batch();
+
+    console.log(delivery);
 
     delivery.packageIds.forEach(packId => {
       batch.update(
@@ -19,100 +21,92 @@ export const createDelivery = (delivery) => {
       );
     })
 
-    batch.commit()
-    .then(() => {      
+    try {      
+      await batch.commit()
       const deliveriesRef = firestore
         .collection("companies")
         .doc(profile.companyId)
         .collection("deliveries")
   
-      deliveriesRef.add({ 
+      await deliveriesRef.add({ 
         ...delivery,
-        status: "indelivery",
+        status: "ready",
         authorFirstName: profile.firstName,
         authorLastName: profile.lastName,
         authorId,
         createdAt: new Date()
-      }).then(res => {
-        dispatch({ type: "CREATE_DELIVERY", payload: delivery })
       })
-      .catch(err => {
-        dispatch({ type: "CREATE_DELIVERY_ERROR", err })
-      })
-    }).catch(err => {
-      dispatch({ type: "CREATE_DELIVERY_ERROR", err })
-    })
-  })
+    } catch (err) {
+      console.log(err);
+    }
+  }
 } 
 
-export const updateDeliveryStatus = (delivery) => {
-  return (dispatch, getState, { getFirebase, getFirestore }) => Promise.resolve().then(() => {
+export const updateDeliveryStatus = (payload) => {
+  return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const profile = getState().firebase.profile;
     const authorId = getState().firebase.auth.uid;
     const firestore = getFirestore();
     const batch = firestore.batch();
 
-    if (delivery.status === "arrived") {
-      delivery.packageIds.forEach(packId => {
-        const pack = firestore
-          .collection("companies")
-          .doc(profile.companyId)
-          .collection("warehouses")
-          .doc(delivery.warehouseIdFrom)
-          .collection("packages")
-          .doc(`${packId}`)
-          .get()
-          .data()
+    const delivery = payload.delivery;
+    const status = payload.status;
+    
+    console.log(delivery);
 
-        console.log("PACKAGE", pack);
-        batch.set(
-          firestore
-          .collection("companies")
-          .doc(profile.companyId)
-          .collection("warehouses")
-          .doc(delivery.warehouseIdFrom)
-          .collection("packages")
-          .doc(`${packId}`), {
-            status: delivery.status
-          }
-        );
-      })
-    } 
-  //   else {
-  //     delivery.packageIds.forEach(packId => {
-  //       batch.update(
-  //         firestore
-  //         .collection("companies")
-  //         .doc(profile.companyId)
-  //         .collection("warehouses")
-  //         .doc(delivery.warehouseIdFrom)
-  //         .collection("packages")
-  //         .doc(`${packId}`), {
-  //           status: delivery.status
-  //         }
-  //       );
-  //     })
-  //   }
+    const warehouseFromRef = firestore
+      .collection("companies")
+      .doc(profile.companyId)
+      .collection("warehouses")
+      .doc(delivery.warehouseIdFrom)
 
-  //   batch.commit()
-  //   .then(() => {      
-  //     const deliveriesRef = firestore
-  //       .collection("companies")
-  //       .doc(profile.companyId)
-  //       .collection("deliveries")
-  
-  //     deliveriesRef.doc(delivery.deliveryId).update({ 
-  //       status: delivery.status,
-  //     }).then(res => {
-  //       dispatch({ type: "UPDATE_DELIVERY", payload: delivery })
-  //     })
-  //     .catch(err => {
-  //       dispatch({ type: "UPDATE_DELIVERY_ERROR", err })
-  //     })
-  //   }).catch(err => {
-  //     dispatch({ type: "UPDATE_DELIVERY_ERROR", err })
-  //   })
-  })
+    const warehouseToRef = firestore
+      .collection("companies")
+      .doc(profile.companyId)
+      .collection("warehouses")
+      .doc(delivery.warehouseIdTo)
+
+      
+    try {
+      if (status === "arrived") {
+        for (const packId of delivery.packageIds) {
+          var pack = await warehouseFromRef.collection("packages").doc(packId).get();
+          pack = pack.data();
+    
+          batch.set(
+            warehouseToRef
+              .collection("packages")
+              .doc(packId)
+            , { ...pack, status: "ready", warehouseId: delivery.warehouseIdTo }
+          )
+    
+          batch.delete(
+            warehouseFromRef
+              .collection("packages")
+              .doc(packId)
+          )
+        }
+      } else if (status === "indelivery") {
+        for (const packId of delivery.packageIds) {
+          batch.update(
+            warehouseFromRef
+              .collection("packages")
+              .doc(packId)
+            , { status: "indelivery" }
+          )
+        }
+      }
+      await batch.commit()
+      await firestore
+        .collection("companies")
+        .doc(profile.companyId)
+        .collection("deliveries")
+        .doc(delivery.id)
+        .update({ status })
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }
 
 export const updateDelivery = (delivery) => {
@@ -144,6 +138,8 @@ export const unpackDelivery = (delivery) => {
     const firestore = getFirestore();
     const batch = firestore.batch();
 
+    console.log(delivery);
+
     const shelfRef = firestore
       .collection("companies")
       .doc(profile.companyId)
@@ -156,12 +152,13 @@ export const unpackDelivery = (delivery) => {
     }
 
     for (const packId of delivery.packageIds) {
+      console.log(packId)
       batch.delete(
         firestore
           .collection("companies")
           .doc(profile.companyId)
           .collection("warehouses")
-          .doc(delivery.warehouseIdFrom)
+          .doc(delivery.warehouseIdTo)
           .collection("packages")
           .doc(packId)
       )
@@ -170,11 +167,11 @@ export const unpackDelivery = (delivery) => {
     try {
       await batch.commit()
       await firestore
-      .collection("companies")
-      .doc(profile.companyId)
-      .collection("deliveries")
-      .doc(delivery.id)
-      .delete()
+        .collection("companies")
+        .doc(profile.companyId)
+        .collection("deliveries")
+        .doc(delivery.id)
+        .delete()
       dispatch({ type: "UPDATE_DELIVERY", payload: delivery })
     } catch(err) {
       dispatch({ type: "UPDATE_DELIVERY_ERROR", err })
