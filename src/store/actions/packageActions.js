@@ -10,12 +10,12 @@ export const createPackage = (payload) => {
     payload.shelves.forEach((shelf) => {
       batch.update(
         firestore
-        .collection("companies")
-        .doc(profile.companyId)
-        .collection("warehouses")
-        .doc(payload.pack.warehouseId)
-        .collection("shelves")
-        .doc(shelf.id), { items: shelf.items || [] }
+          .collection("companies")
+          .doc(profile.companyId)
+          .collection("warehouses")
+          .doc(payload.pack.warehouseId)
+          .collection("shelves")
+          .doc(shelf.id), { items: shelf.items || [] }
       );
     });
 

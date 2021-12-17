@@ -336,7 +336,11 @@ export default function DeliveryForms() {
           </CCardBody>
         </CCard>
         <div className="d-flex justify-content-end mt-3">
-          <CButton disabled={isSubmitting} color="success" type="submit">
+          <CButton 
+            // disabled={isSubmitting} 
+            color="success" 
+            type="submit"
+          >
             Submit
           </CButton>
         </div>

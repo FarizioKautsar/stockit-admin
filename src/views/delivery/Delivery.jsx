@@ -73,15 +73,15 @@ export default function Delivery() {
 
   const [isChangingStatus, setIsChangingStatus] = useState(false);
 
-  function handleChangeStatus() {
+  function handleShowChangeStatus() {
     setIsChangingStatus(!isChangingStatus);
   }
 
   function onSubmit(data) {
-    const payload = {...delivery, status: getValues("status")};
+    const payload = { delivery, status: getValues("status") };
     dispatch(updateDeliveryStatus(payload))
       .finally(() => {
-        handleChangeStatus()
+        // handleShowChangeStatus()
       })
   }
 
@@ -141,7 +141,7 @@ export default function Delivery() {
                   </CCol>
                   <CCol xs={6} className="d-flex align-items-start">
                     <CButton
-                      onClick={handleChangeStatus}
+                      onClick={handleShowChangeStatus}
                       variant="outline"
                       color={isChangingStatus ? "danger" : "primary"}
                     >
@@ -171,10 +171,10 @@ export default function Delivery() {
                   return pack && (
                     <CCard>
                       <CCardBody>
-                        <p><strong>{pack.title}</strong></p>
+                        <p><strong>{pack?.title}</strong></p>
                         <table>
                           {
-                            pack.items.slice(0, 3).map(item => (
+                            pack?.items?.slice(0, 3).map(item => (
                               <tr>
                                 <td style={{minWidth: 160, fontWeight: 600}}>{products?.[item.id]?.name}</td> 
                                 <td>x {item.quantity}</td> 
@@ -183,8 +183,8 @@ export default function Delivery() {
                           }
                         </table>
                         {
-                          (pack.items.length - 3 > 0) && (
-                            <p>and {pack.items.length - 3} more items</p>
+                          (pack?.items?.length - 3 > 0) && (
+                            <p>and {pack?.items?.length - 3} more items</p>
                           )
                         }
                       </CCardBody>
@@ -193,13 +193,17 @@ export default function Delivery() {
                 })
               }
             </CCol>
-            <CCol xs={12}>
-              <Link to={deliveryId + "/unpack"}>
-                <CButton>
-                  Unpack Delivery
-                </CButton>
-              </Link>
-            </CCol>
+            {
+              delivery?.status === "arrived" && (
+                <CCol xs={12}>
+                  <Link to={deliveryId + "/unpack"}>
+                    <CButton>
+                      Unpack Delivery
+                    </CButton>
+                  </Link>
+                </CCol>
+              )
+            }
           </CRow>
         </CCardBody>
       </CCard>

@@ -8,18 +8,18 @@ export const createWarehouse = (warehouse) => {
     try {
       const warehouseDoc = await firestore
         .collection("companies")
-        .doc(profile.companyId)
+        .doc(`${profile.companyId}`)
         .collection("warehouses")
         .add({
           ...warehouse,
           createdAt: new Date(),
           location: new firestore.GeoPoint(
-            warehouse.location.lat, 
-            warehouse.location.lng
+            warehouse.locationPoint.lat, 
+            warehouse.locationPoint.lng
           )
         })
 
-      ([...Array(parseInt(warehouse.shelvesAmount)).keys()]).forEach((n) => {
+      for (const n of [...Array(parseInt(warehouse.shelvesAmount)).keys()]) {
         batch.set(
           firestore
             .collection("companies")
@@ -33,7 +33,7 @@ export const createWarehouse = (warehouse) => {
             items: []
           }
         )
-      })
+      }
 
       await batch.commit()
     } catch (err) {
@@ -59,6 +59,7 @@ export const createItems = (payload) => {
       .doc(warehouseId)
       .collection("shelves")
 
+    console.log("SHELVES REF")
 
     for (const item of items) {
       batch.set(
@@ -68,6 +69,8 @@ export const createItems = (payload) => {
         .collection("products")
         .doc(item.id), { name: item.name }
       );
+
+      console.log(item)
         
       var shelf = await shelvesRef.doc(item.shelfId).get();
       shelf = shelf.data()

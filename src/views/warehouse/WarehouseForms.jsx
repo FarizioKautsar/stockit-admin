@@ -62,8 +62,7 @@ function WarehouseForms(props) {
 
   async function onSubmit(data) {
     setIsSubmitting(true);
-    const payload = {...data, location};
-    console.log("CREATING")
+    const payload = {...data, locationPoint: location};
     await dispatch(createWarehouse(payload));
     setIsSubmitting(false);
     history.push("/warehouses");
