@@ -10,6 +10,7 @@ import PackageForms from './views/packages/PackageForms';
 import Packages from './views/packages/Packages';
 import CompanyForms from './views/pages/companyInit/CompanyForms';
 import UserForms from './views/users/UserForms';
+import Users from './views/users/Users.jsx';
 import Inventory from './views/warehouse/Inventory';
 import Warehouse from './views/warehouse/Warehouse';
 import WarehouseForms from './views/warehouse/WarehouseForms';
@@ -63,7 +64,6 @@ const Modals = React.lazy(() => import('./views/notifications/modals/Modals'));
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'));
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'));
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'));
-const Users = React.lazy(() => import('./views/users/Users'));
 const User = React.lazy(() => import('./views/users/User'));
 
 const routes = [
@@ -79,7 +79,7 @@ const routes = [
   { path: '/deliveries/:deliveryId/unpack', exact: true, name: 'Unpack Delivery', component: DeliveryUnpack },
   { path: '/deliveries/:deliveryId/edit', exact: true, name: 'Edit Delivery', component: DeliveryForms },
   { path: '/deliveries', exact: true, name: 'Deliveries', component: Deliveries },
-  { path: '/users', exact: true, name: 'Users' },
+  { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/create', exact: true, name: 'Create User', component: UserForms },
   { path: '/warehouses/create', exact: true, name: 'Create Warehouse', component: WarehouseForms },
   { path: '/warehouses/:warehouseId', exact: true, name: 'Warehouse Details', component: Warehouse },

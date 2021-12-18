@@ -1,5 +1,5 @@
 export const signIn = (credentials) => {
-  return (dispatch, getState, { getFirebase, getFirestore }) => {
+  return async (dispatch, getState, { getFirebase, getFirestore }) => {
     const firebase = getFirebase();
 
     firebase.login({
@@ -14,10 +14,10 @@ export const signIn = (credentials) => {
 }
 
 export const signOut = () => {
-  return (dispatch, getState, { getFirebase }) => {
+  return async (dispatch, getState, { getFirebase }) => {
     const firebase = getFirebase();
 
-    firebase.logout()
+    await firebase.logout()
       .then(() => {
         dispatch({ type: "LOGOUT_SUCCESS" })
       })

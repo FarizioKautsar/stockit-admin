@@ -51,12 +51,6 @@ export default function UserForms() {
 
   return (
     <div>
-      <Link to="/users">
-        <CButton className="mb-3">
-          <MdArrowBack/>
-          Back
-        </CButton>
-      </Link>
       <CForm onSubmit={handleSubmit(onSubmit)}>
         <CCard>
           <CCardHeader>
